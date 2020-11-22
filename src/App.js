@@ -1,6 +1,8 @@
-import { useCallback, useRef, useState } from 'react';
+import { Button, Col, Row } from 'antd';
 import produce from 'immer';
+import { useCallback, useRef, useState } from 'react';
 import './App.css';
+import 'antd/dist/antd.css';
 
 const numRows = 30;
 const numCols = 30;
@@ -47,7 +49,20 @@ const App = () => {
 		} else if (evt.buttons === 2) {
 			switchCell(rowIdx, colIdx, 0)
 		}
-		// console.log(evt);
+	}
+
+	const randomGrid = () => {
+		const rows = [];
+		for (let i = 0; i < numRows; i++) {
+			rows.push(Array.from(Array(numCols), () => {
+				const val = Math.random();
+				if (val > 0.8)
+					return 1;
+				else
+					return 0;
+			}));
+		}
+		return rows;
 	}
 
 	const runSimulation = useCallback(() => {
@@ -81,18 +96,18 @@ const App = () => {
 
   	return (
 		<div className='App'>
-			<button onClick={() => {
-				setRunning(!running);
-				runningRef.current = !running;
-				runSimulation();
-			}}>{running ? 'Stop' : 'Start'}</button>
-			{/* <button onClick={}>Random Board</button> */}
-			<button onClick={() => setGrid(newGrid())}>Reset Board</button>
-			<div onContextMenu={(evt) => evt.preventDefault()} 
-			style={{
-				display: 'grid',
-				gridTemplateColumns: `repeat(${numCols}, 20px)`
-			}}>
+			<Row justify='center' gutter={[16,16]} align='middle'>
+				<Col><Button type='primary' shape='round' onClick={() => {
+						setRunning(!running);
+						runningRef.current = !running;
+						runSimulation();
+					}}>{running ? 'Stop' : 'Start'}</Button></Col>
+				<Col><Button type='primary' shape='round' onClick={() => setGrid(randomGrid())}>Random Board</Button></Col>
+				<Col><Button type='primary' shape='round' onClick={() => setGrid(newGrid())}>Reset Board</Button></Col>
+				<Col>Left Click to Draw</Col>
+				<Col>Right Click to Erase</Col>
+			</Row>
+			<div onContextMenu={(evt) => evt.preventDefault()} className='grid'>
 				{
 					grid.map((rows, rowIdx) => 
 						rows.map((col, colIdx) => {
@@ -101,9 +116,7 @@ const App = () => {
 									onMouseDown={() => switchCell(rowIdx, colIdx)}
 									onMouseOver={(evt) => hoverCell(evt, rowIdx, colIdx)}
 									className='cell' 
-									style={{ width: 20,
-										height: 20,
-										border: 'solid 1px black',
+									style={{
 										backgroundColor: grid[rowIdx][colIdx] ? '#454545' : 'white'
 									}}
 								/>
