@@ -9,6 +9,10 @@
 	color: whitesmoke;
 }
 
+.App > h1 {
+	color: whitesmoke;
+}
+
 .grid {
 	display: grid;
 	grid-template-columns: repeat(30, min(2.5vw, 20px));

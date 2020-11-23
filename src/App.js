@@ -1,8 +1,9 @@
-import { Button, Col, Row } from 'antd';
+import { Avatar, Button, Col, Divider, Row } from 'antd';
 import produce from 'immer';
 import { useCallback, useRef, useState } from 'react';
 import './App.css';
 import 'antd/dist/antd.css';
+import logo from './logo.svg';
 
 const numRows = 30;
 const numCols = 30;
@@ -33,21 +34,26 @@ const App = () => {
 	const runningRef = useRef(running);
 	runningRef.current = running;
 
-	const switchCell = (rowIdx, colIdx, state = null) => {
+	const switchCell = (evt, rowIdx, colIdx, state = null) => {
 		const newGrid = produce(grid, gridCopy => {
 			if(state != null)
 				gridCopy[rowIdx][colIdx] = state;
-			else
-				gridCopy[rowIdx][colIdx] = !gridCopy[rowIdx][colIdx];
+			else {
+				if (evt.buttons === 1) {
+					gridCopy[rowIdx][colIdx] = 1;
+				} else if (evt.buttons === 2) {
+					gridCopy[rowIdx][colIdx] = 0;
+				}
+			}
 		})
 		setGrid(newGrid);
 	};
 	
 	const hoverCell = (evt, rowIdx, colIdx) => {
 		if (evt.buttons === 1) {
-			switchCell(rowIdx, colIdx, 1)
+			switchCell(evt, rowIdx, colIdx, 1)
 		} else if (evt.buttons === 2) {
-			switchCell(rowIdx, colIdx, 0)
+			switchCell(evt, rowIdx, colIdx, 0)
 		}
 	}
 
@@ -96,14 +102,20 @@ const App = () => {
 
   	return (
 		<div className='App'>
+			<Avatar src={logo} alt='logo' size={100} />
+			<h1>Conway's Game of Life</h1>
 			<Row justify='center' gutter={[16,16]} align='middle'>
-				<Col><Button type='primary' shape='round' onClick={() => {
+				<Col><Button type='primary' shape='round' danger={running} onClick={() => {
 						setRunning(!running);
 						runningRef.current = !running;
 						runSimulation();
 					}}>{running ? 'Stop' : 'Start'}</Button></Col>
 				<Col><Button type='primary' shape='round' onClick={() => setGrid(randomGrid())}>Random Board</Button></Col>
-				<Col><Button type='primary' shape='round' onClick={() => setGrid(newGrid())}>Reset Board</Button></Col>
+				<Col><Button type='primary' shape='round' onClick={() => {
+					setGrid(newGrid());
+					setRunning(false);
+					runningRef.current = false;
+				}}>Reset Board</Button></Col>
 				<Col>Left Click to Draw</Col>
 				<Col>Right Click to Erase</Col>
 			</Row>
@@ -113,7 +125,7 @@ const App = () => {
 						rows.map((col, colIdx) => {
 							return (
 								<div key={`${rowIdx}-${colIdx}`}
-									onMouseDown={() => switchCell(rowIdx, colIdx)}
+									onMouseDown={(evt) => switchCell(evt, rowIdx, colIdx)}
 									onMouseOver={(evt) => hoverCell(evt, rowIdx, colIdx)}
 									className='cell' 
 									style={{
@@ -125,6 +137,7 @@ const App = () => {
 					)
 				}
 			</div>
+			<Row><a href='https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life' target='_blank' rel='noreferrer noopener'>Learn more about Conway's Game of Life</a></Row>
 		</div>
 	);
 }
