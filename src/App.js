@@ -1,4 +1,4 @@
-import { Avatar, Button, Col, Divider, Row } from 'antd';
+import { Avatar, Button, Col, Row } from 'antd';
 import produce from 'immer';
 import { useCallback, useRef, useState } from 'react';
 import './App.css';
@@ -17,7 +17,7 @@ const operations = [
 	[1,-1],
 	[1,0],
 	[1,1],
-]
+];
 
 const App = () => {
 	const newGrid = () => {
@@ -43,6 +43,8 @@ const App = () => {
 					gridCopy[rowIdx][colIdx] = 1;
 				} else if (evt.buttons === 2) {
 					gridCopy[rowIdx][colIdx] = 0;
+				} else {
+					gridCopy[rowIdx][colIdx] = !grid[rowIdx][colIdx];
 				}
 			}
 		})
@@ -51,9 +53,9 @@ const App = () => {
 	
 	const hoverCell = (evt, rowIdx, colIdx) => {
 		if (evt.buttons === 1) {
-			switchCell(evt, rowIdx, colIdx, 1)
+			switchCell(evt, rowIdx, colIdx, 1);
 		} else if (evt.buttons === 2) {
-			switchCell(evt, rowIdx, colIdx, 0)
+			switchCell(evt, rowIdx, colIdx, 0);
 		}
 	}
 
@@ -62,7 +64,7 @@ const App = () => {
 		for (let i = 0; i < numRows; i++) {
 			rows.push(Array.from(Array(numCols), () => {
 				const val = Math.random();
-				if (val > 0.8)
+				if (val > 0.75)
 					return 1;
 				else
 					return 0;
@@ -87,7 +89,6 @@ const App = () => {
 								neighbors += grid[xIdx][yIdx];
 							}
 						});
-
 						if (neighbors < 2 || neighbors > 3) {
 							gridCopy[rowIdx][colIdx] = 0;
 						} else if (neighbors === 3 && grid[rowIdx][colIdx] === 0) {
